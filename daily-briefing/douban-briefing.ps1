@@ -11,7 +11,7 @@ $Config = @{
     ToEmail      = "haoyanghan@foxmail.com"
 }
 
-$ExcludeKeywords   = @("刷券", "付邮送", "闲置")
+$ExcludeKeywords   = @("刷券", "付邮送", "闲置", "求购")
 $PriorityKeywords  = @("神价", "速度", "0元", "免费", "反薅")
 $IncludeCategories = @("作业", "教程", "交流")
 
