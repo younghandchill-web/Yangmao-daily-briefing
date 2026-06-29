@@ -43,7 +43,7 @@ function Extract-Posts {
         if ($m.Success) { $url = $m.Groups[1].Value -replace '&amp;', '&' }
 
         $titleText = ""
-        $m2 = [regex]::Match($row, 'title="([^"]*)"')
+        $m2 = [regex]::Match($row, '<a[^>]*title="([^"]*)"')
         if ($m2.Success) { $titleText = $m2.Groups[1].Value -replace '&amp;', '&' }
 
         $displayText = ""
@@ -70,7 +70,7 @@ function Extract-Posts {
             $posts += [PSCustomObject]@{
                 Url=$url; Title=$titleText; Category=$category
                 Author=$author; Replies=$replies; Time=$time
-                AgeHours=Get-PostAge $time
+                AgeHours=Get-PostAge $time; DisplayText=$displayText
             }
         }
     }
@@ -94,7 +94,7 @@ $allPosts = Extract-Posts $html
 Write-Host ("Found " + $allPosts.Count + " posts")
 
 Write-Host "[3] Filtering..."
-$filtered = $allPosts | Where-Object { $skip=$false; foreach($kw in $ExcludeKeywords){if($_.Title -match $kw){$skip=$true;break}}; -not $skip }
+$filtered = $allPosts | Where-Object { $skip=$false; foreach($kw in $ExcludeKeywords){if($_.Title -match $kw -or $_.DisplayText -match $kw -or $_.Category -match $kw){$skip=$true;break}}; -not $skip }
 $interest = $filtered | Where-Object { $_.Category -in $IncludeCategories -or $_.Category -eq "" }
 $priority = $interest | Where-Object { $matched=$false; foreach($kw in $PriorityKeywords){if($_.Title -match $kw){$matched=$true;break}}; $matched } | Sort-Object Replies -Descending
 $normal   = $interest | Where-Object { $matched=$false; foreach($kw in $PriorityKeywords){if($_.Title -match $kw){$matched=$true;break}}; -not $matched } | Sort-Object AgeHours
